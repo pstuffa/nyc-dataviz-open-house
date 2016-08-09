@@ -7,6 +7,14 @@
 **Creator** Based on course materials by [Kevin Quealy](https://twitter.com/kevinq)  
 **Instructor:** [Paul Buffa](https://www.linkedin.com/in/paul-buffa)  
 
+## About Me
+
+* Data Visualization Engineer @ Capital One
+* Instructor at Metis
+* Former Data Scientist at Kaplan and TA for the Metis Data Science Bootcamp
+* Runs way too much
+* Love making music 
+
 ---
 
 # What is D3?
@@ -53,7 +61,7 @@ We'll configure our computers, make our first charts, understand why data joins 
  * Bar charts
  * The fiddly bits: axes, formatting, etc.
 
- [Alexander Kennedy](https://dadadata.herokuapp.com/quartet)
+ [Alexander Kennedy](http://bl.ocks.org/alejandrokennedy/raw/f61f8ac247ddcd6310ba85534449ed8b/)
 
 *WEEK 2* Enough to be Dangerous: Mastering Basic Forms
 If you want to be good at data viz, you need to master bar charts, line charts, scatter plots, and histograms. We'll make demos of each and learn when to use which.
