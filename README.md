@@ -47,7 +47,7 @@ Let's go head-to-head with [Google Charts](https://docs.google.com/spreadsheets/
 
 ++A if you have experience with Web Dev, Design, Data Analysis and Github
 
-# Couree Syllabus
+# Course Syllabus
 
 
 #### Schedule
