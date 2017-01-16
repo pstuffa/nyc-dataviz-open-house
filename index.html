@@ -3,7 +3,7 @@
 <style>
 
 body {
-  font: 10px sans-serif;
+  font: 12px sans-serif;
 }
 
 .axis path,
@@ -15,125 +15,114 @@ body {
 
 </style>
 <body>
-<script src="//d3js.org/d3.v3.min.js"></script>
+  <h1 id="title">Numbers of Runs by Day of Week</h1>
+  <div id="dropdown"></div>
+  <div id="chart"></div>
+  <div id="mouseover"> </div>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="//d3js.org/d3-scale-chromatic.v0.3.min.js"></script>
 <script>
 
 var margin = {top: 20, right: 20, bottom: 30, left: 40},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
-var x = d3.scale.linear()
-    .range([0, width]);
+var x = d3.scaleBand()
+    .padding([.1])
+    .rangeRound([0, width]);
 
-var y = d3.scale.linear()
+var y = d3.scaleLinear()
     .range([height, 0]);
 
-var color = d3.scale.category10();
+var numberFormat = d3.format(",d")
 
-var xAxis = d3.svg.axis()
-    .scale(x)
-    .orient("bottom");
-
-var yAxis = d3.svg.axis()
-    .scale(y)
-    .orient("left");
-
-var svg = d3.select("body").append("svg")
+var svg = d3.select("#chart").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-d3.tsv("data.tsv", function(error, data) {
+d3.tsv("running.tsv", function(error, data) {
   if (error) throw error;
 
   data.forEach(function(d) {
-    d.sepalLength = +d.sepalLength;
-    d.sepalWidth = +d.sepalWidth;
-    d.pedalLength = +d.pedalLength;
-    d.pedalWidth = +d.pedalWidth;
-
+    d["Distance"] = +d["Distance"];
+    d["Elevation Gain"] = +d["Elevation Gain"];
+    d["Avg HR"] = +d["Avg HR"];
+    d["Max HR"] = +d["Max HR"];
   });
 
-  x.domain(d3.extent(data, function(d) { return d.sepalWidth; })).nice();
-  y.domain(d3.extent(data, function(d) { return d.sepalLength; })).nice();
+  var dateOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+
+  var nestedData = d3.nest()
+        .key(function(d) { return d["Day of Week"]})
+        
+        .rollup(function(leaves) {
+          return {
+            "Distance": d3.sum(leaves, function(d) { return d["Distance"]}),
+            "Number of Runs": leaves.length,
+            "Avg HR": d3.mean(leaves, function(d) { return d["Avg HR"]}),
+            "Elevation Gain": d3.sum(leaves, function(d) { return d["Elevation Gain"]}),
+            "Max HR": d3.max(leaves, function(d) { return d["Max HR"]})
+          }
+        })
+        .entries(data);
+
+  var options = ["Distance","Elevation Gain","Avg HR","Max HR"];
+
+  x.domain(d3.set(data.map(function(d) { return d["Day of Week"]; })).values().sort(function(a,b) { return dateOrder.indexOf(a) - dateOrder.indexOf(b); }));
+  y.domain(d3.extent(nestedData.map(function(d) { return d.value["Number of Runs"] }))).nice();
 
   svg.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0," + height + ")")
-      .call(xAxis)
-    .append("text")
-      .attr("class", "label")
-      .attr("x", width)
-      .attr("y", -6)
-      .style("text-anchor", "end")
-      .text("Sepal Width (cm)");
+      .call(d3.axisBottom(x))
 
   svg.append("g")
       .attr("class", "y axis")
-      .call(yAxis)
-    .append("text")
-      .attr("class", "label")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .text("Sepal Length (cm)")
+      .call(d3.axisLeft(y))
 
-  svg.selectAll("circle")
-      .data(data)
-    .enter().append("circle")
-      .attr("class",function(d) { return d.species; })
-      .attr("r", 5)
-      // adjusting size 
-      // .attr("r", function(d) { return d.sepalWidth/d.sepalLength * 10; })
-      .attr("cx", function(d) { return x(d.sepalWidth); })
-      .attr("cy", function(d) { return y(d.sepalLength); })
+    // var color = d3.scaleOrdinal(d3.schemeCategory10);
+    var elevationColor = d3.scaleLinear()
+        .range(["white", "steelblue"])
+        .domain(d3.extent(nestedData.map(function(d) { return d.value["Elevation Gain"] })))
+
+  svg.selectAll(".bar")
+      .data(nestedData)
+    .enter().append("rect")
+      .attr("class",function(d) { return "bar " + d.value["Day of Week"]; })
+      .attr("width", x.bandwidth())
+      .attr("height", function(d) { return height - y(d.value["Number of Runs"]); })
+      .attr("x", function(d) { return x(d.key); })
+      .attr("y", function(d) { return y(d.value["Number of Runs"]); })
       // Adjusting by color 
-      .style("stroke", "#fff")
-      .style("fill", "0000ff")
-      // .style("fill", function(d) { return color(d.species); });
+      .style("stroke", "#000")
+      .style("fill", "steelblue")
+      // .style("fill", function(d) { return elevationColor(d.value["Elevation Gain"]); })
+      // .style("fill", function(d) { return color(d.key); })
+      // .on("mouseenter", function(d) { 
 
+      //   d3.select("#mouseover")
+      //   .text(d.key + ": " + 
+      //     d.value["Number of Runs"] + " runs, " + 
+      //     numberFormat(d.value["Distance"]) + " miles ran " + 
+      //     numberFormat(d.value["Elevation Gain"]) + " total elevation gain, and " + 
+      //     numberFormat(d.value["Avg HR"]) + " average BPM." 
+      //     )
 
-  var legend = svg.selectAll(".legend")
-      .data(color.domain())
-    .enter().append("g")
-      .attr("class", "legend")
-      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
-
-  legend.append("rect")
-      .attr("x", width - 18)
-      .attr("width", 18)
-      .attr("height", 18)
-      .style("fill", color)
-      // // Adding interactivity 
-      // .on("mouseenter", function(d) {
-
-      //   d3.selectAll("circle")
-      //     .style("fill-opacity", .2);
-
-      //   d3.selectAll("." + d)
-      //     .style("fill-opacity", 1);
       // })
-      // .on("mouseleave", function(d) {
+      // .on("mouseleave", function(d) { 
 
-      //   d3.selectAll("circle")
-      //     .style("fill-opacity", 1);
+      //   d3.select("#mouseover")
+      //   .text("");
+
       // })
-
-
-  legend.append("text")
-      .attr("x", width - 24)
-      .attr("y", 9)
-      .attr("dy", ".35em")
-      .style("text-anchor", "end")
-      .text(function(d) { return d; });
 
 
   // Add in other features
-  // var options = ["sepalLength","sepalWidth","petalLength","petalWidth"];
+  // var options = ["Number of Runs", "Elevation Gain","Distance","Avg HR","Max HR"];
   
-  // var dropdown = d3.select("body")
+  // var dropdown = d3.select("#dropdown")
   //     .append("select")
   //     .on("change", change);
 
@@ -144,21 +133,25 @@ d3.tsv("data.tsv", function(error, data) {
     
   // function change() { 
 
-  //   var column = this.value;
+  //   var column = this.value,
+  //       text = column + " by Day of Week";
 
-  //   y.domain(d3.extent(data, function(d) { return d[column]; })).nice();
+  //   y.domain(d3.extent(nestedData.map(function(d) { return d.value[column] }))).nice();
 
-  //   d3.selectAll("circle")
+  //   d3.select("#title")
+  //     .text(text)
+
+  //   d3.selectAll(".bar")
   //     .transition()
   //     .duration(2000)
-  //     .attr("r", function(d) { return d.sepalWidth/d[column] * 10; })
-  //     .attr("cy", function(d) { return y(d[column]); })
+  //     .attr("height", function(d) { return height - y(d.value[column]); })
+  //     .attr("y", function(d) { return y(d.value[column]); });
 
   //   d3.select(".y")
   //     .transition()
-  //     .call(yAxis)
+  //     .call(d3.axisLeft(y))
   //     .select(".label")
-  //     .text(column + " (cm)")
+  //     .text(column)
   // }
 
 });
