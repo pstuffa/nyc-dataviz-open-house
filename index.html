@@ -54,9 +54,9 @@ d3.tsv("running.tsv", function(error, data) {
 
   var dateOrder = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
+  // Aggregate data
   var nestedData = d3.nest()
         .key(function(d) { return d["Day of Week"]})
-        
         .rollup(function(leaves) {
           return {
             "Distance": d3.sum(leaves, function(d) { return d["Distance"]}),
@@ -70,7 +70,9 @@ d3.tsv("running.tsv", function(error, data) {
 
   var options = ["Distance","Elevation Gain","Avg HR","Max HR"];
 
+  // x.domain(dateOrder);
   x.domain(d3.set(data.map(function(d) { return d["Day of Week"]; })).values().sort(function(a,b) { return dateOrder.indexOf(a) - dateOrder.indexOf(b); }));
+  
   y.domain(d3.extent(nestedData.map(function(d) { return d.value["Number of Runs"] }))).nice();
 
   svg.append("g")
@@ -82,7 +84,9 @@ d3.tsv("running.tsv", function(error, data) {
       .attr("class", "y axis")
       .call(d3.axisLeft(y))
 
-    // var color = d3.scaleOrdinal(d3.schemeCategory10);
+    var color = d3.scaleOrdinal(d3.schemeSet3);
+
+    // Add custom scales
     var elevationColor = d3.scaleLinear()
         .range(["white", "steelblue"])
         .domain(d3.extent(nestedData.map(function(d) { return d.value["Elevation Gain"] })))
@@ -95,19 +99,22 @@ d3.tsv("running.tsv", function(error, data) {
       .attr("height", function(d) { return height - y(d.value["Number of Runs"]); })
       .attr("x", function(d) { return x(d.key); })
       .attr("y", function(d) { return y(d.value["Number of Runs"]); })
+
       // Adjusting by color 
-      .style("stroke", "#000")
-      .style("fill", "steelblue")
+      // .style("stroke", "#000")
+      // .style("fill", "steelblue")
       // .style("fill", function(d) { return elevationColor(d.value["Elevation Gain"]); })
       // .style("fill", function(d) { return color(d.key); })
+
+      // Adding interactions
       // .on("mouseenter", function(d) { 
 
       //   d3.select("#mouseover")
       //   .text(d.key + ": " + 
       //     d.value["Number of Runs"] + " runs, " + 
-      //     numberFormat(d.value["Distance"]) + " miles ran " + 
-      //     numberFormat(d.value["Elevation Gain"]) + " total elevation gain, and " + 
-      //     numberFormat(d.value["Avg HR"]) + " average BPM." 
+      //     numberFormat(d.value["Distance"]) + " miles ran, " + 
+      //     numberFormat(d.value["Elevation Gain"]) + " total elevation gain, and an average BPM of" + 
+      //     numberFormat(d.value["Avg HR"])
       //     )
 
       // })
@@ -119,7 +126,18 @@ d3.tsv("running.tsv", function(error, data) {
       // })
 
 
-  // Add in other features
+  // Add Labels
+  // svg.selectAll(".bar-text")
+  //     .data(nestedData)
+  //   .enter().append("text")
+  //     .attr("class",function(d) { return "bar-text " + d.value["Day of Week"]; })
+  //     .attr("x", function(d) { return x(d.key); })
+  //     .attr("y", function(d) { return y(d.value["Number of Runs"]); })
+  //     .attr("dy", -2)
+  //     .text(function(d) { return numberFormat(d.value["Number of Runs"])})
+
+
+  // Add in other features, like a dropdown for different metrics
   // var options = ["Number of Runs", "Elevation Gain","Distance","Avg HR","Max HR"];
   
   // var dropdown = d3.select("#dropdown")
@@ -146,6 +164,23 @@ d3.tsv("running.tsv", function(error, data) {
   //     .duration(2000)
   //     .attr("height", function(d) { return height - y(d.value[column]); })
   //     .attr("y", function(d) { return y(d.value[column]); });
+
+  // d3.selectAll(".bar-text")
+  //     .transition()
+  //     .duration(2000)
+  //     .attr("y", function(d) { return y(d.value[column]); })
+  //     .attr("dy", -2)   
+  //     .on("start", function repeat(d) {
+  //     d3.active(this)
+  //         .tween("text", function() {
+  //           var that = d3.select(this),
+  //               i = d3.interpolateNumber(that.text().replace(/,/g, ""), d.value[column]);
+  //           return function(t) { that.text(numberFormat(i(t))); };
+  //         })
+  //       .transition()
+  //         .delay(1500)
+  //         .on("start", repeat);
+  //   });
 
   //   d3.select(".y")
   //     .transition()
