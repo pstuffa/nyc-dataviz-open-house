@@ -2,7 +2,7 @@
 
 **Course:**  [Metis Data Visualization](http://www.thisismetis.com/data-visualization-d3-course)  
 **City:**    New York, NY  
-**Dates:**   2/13/17 - 3/22/17  
+**Dates:**   8/15/17 - 9/21/17  
 
 **Creator** Based on course materials by [Kevin Quealy](https://twitter.com/kevinq)  
 **Instructor:** [Paul Buffa](https://www.linkedin.com/in/paul-buffa)  
@@ -12,8 +12,6 @@
 * Data Visualization Engineer @ Capital One
 * Instructor at Metis
 * Former Data Scientist at Kaplan and TA for the Metis Data Science Bootcamp
-* Runs way too much
-* Love making music 
 
 ---
 
@@ -61,8 +59,6 @@ We'll configure our computers, make our first charts, understand why data joins 
  * Bar charts
  * The fiddly bits: axes, formatting, etc.
 
- [Alexander Kennedy](http://bl.ocks.org/alejandrokennedy/raw/f61f8ac247ddcd6310ba85534449ed8b/)
-
 *WEEK 2* Enough to be Dangerous: Mastering Basic Forms
 If you want to be good at data viz, you need to master bar charts, line charts, scatter plots, and histograms. We'll make demos of each and learn when to use which.
 
@@ -78,8 +74,6 @@ If you want to be good at data viz, you need to master bar charts, line charts, 
 
 *WEEK 4* Maps
 Mapping with D3 has exploded in the last few years. We'll learn how to make bubble maps, choropleth maps, and will create topojson files from scratch.
-
-[Sami Rubenfeld](http://bl.ocks.org/sarubenfeld/raw/9390b66fc33eecf73b1c44d06ab0e0bf/)
 
 *WEEK 5* Making Dynamic Content
 We'll use D3 to make dynamic charts and applications that let us answer questions and solve problems that wouldn’t be possible in a printed format.

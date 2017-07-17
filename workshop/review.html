@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  font: 12px sans-serif;
+}
+
+.line {
+  stroke: steelblue;
+  stroke-width: 2;
+  fill: none;
+}
+
+.dot {
+  stroke: #fff;
+  fill: steelblue;
+}
+
+</style>
+<body>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+
+var margin = {top: 20, right: 20, bottom: 60, left: 60},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var timeScale = d3.scaleTime()
+    .range([0, width]);
+
+var distanceScale = d3.scaleLinear()
+    .range([height, 0]);
+
+var parseDate = d3.utcParse("%m/%d/%Y");
+
+var lineGenerator = d3.line()
+    .curve(d3.curveCardinal)
+    .x(function(d) { return timeScale(d["Parsed Date"]) })
+    .y(function(d) { return distanceScale(d["Distance"])})
+
+d3.tsv("running.tsv", function(error, data) {
+  if (error) throw error;
+
+  console.log(data);
+
+  data.forEach(function(d) {
+    d["Distance"] = +d["Distance"];
+    d["Elevation Gain"] = +d["Elevation Gain"];
+    d["Avg HR"] = +d["Avg HR"];
+    d["Max HR"] = +d["Max HR"];
+    d["Parsed Date"] = parseDate(d["Date"]);
+  });
+
+  timeScale.domain(d3.extent(data, function(d) { return d["Parsed Date"] }));
+  distanceScale.domain(d3.extent(data, function(d) { return d["Distance"] }));
+
+  svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(timeScale));
+
+  svg.append("g")
+    .attr("class", "y axis")
+    .call(d3.axisLeft(distanceScale));
+
+  svg.append("text")
+    .attr("y", height/2)
+    .attr("dy", -30)
+    .text("Distance Ran")
+    .attr("transform", "rotate(-90, 0, " + (height/2) + ")")
+
+  svg.append("path")
+    .datum(data)
+    .attr("class", "line")
+    .attr("d", lineGenerator)
+
+  svg.selectAll(".dot")
+    .data(data)
+  .enter().append("circle")
+    .attr("class", "dot")
+    .attr("cx", function(d) { return timeScale(d["Parsed Date"]) })
+    .attr("cy", function(d) { return distanceScale(d["Distance"]) })
+    .attr("r", 3);
+
+});
+
+
+</script>
