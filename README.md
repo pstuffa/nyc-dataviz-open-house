@@ -2,7 +2,8 @@
 
 **Course:**  [Metis Data Visualization](http://www.thisismetis.com/data-visualization-d3-course)  
 **City:**    New York, NY  
-**Dates:**   8/15/17 - 9/21/17  
+**Dates:**   11/06/17 - 12/13/17  
+**Times:**   M/W, 6:30 - 9:30pm EDT
 
 **Creator** Based on course materials by [Kevin Quealy](https://twitter.com/kevinq)  
 **Instructor:** [Paul Buffa](https://www.linkedin.com/in/paul-buffa)  
